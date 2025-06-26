@@ -53,10 +53,6 @@
         const tamanhoBloco = 20;
         const totalBlocos = tela.width / tamanhoBloco;
 
-        let fundoImagem = new Image();
-        fundoImagem.src = "fundo.png.jpeg";
-
-
         let cobrinha = [{ x: 5, y: 5 }];
         let direcao = "direita";
         let intervaloJogo;
@@ -64,7 +60,8 @@
         let pontuacao = 0;
 
         function desenharCenario() {
-            contexto.drawImage(fundoImagem, 0, 0, tela.width, tela.height);
+            contexto.fillStyle = "black";
+            contexto.fillRect(0, 0, tela.width, tela.height);
         }
 
         function desenharCobrinha() {
@@ -80,10 +77,25 @@
         }
 
         function gerarComida() {
-            return {
-                x: Math.floor(Math.random() * totalBlocos),
-                y: Math.floor(Math.random() * totalBlocos)
-            };
+            let novaComida;
+            let emCimaDaCobrinha;
+
+            do {
+                emCimaDaCobrinha = false;
+                novaComida = {
+                    x: Math.floor(Math.random() * totalBlocos),
+                    y: Math.floor(Math.random() * totalBlocos)
+                };
+
+                for (let parte of cobrinha) {
+                    if (parte.x === novaComida.x && parte.y === novaComida.y) {
+                        emCimaDaCobrinha = true;
+                        break;
+                    }
+                }
+            } while (emCimaDaCobrinha);
+
+            return novaComida;
         }
 
         function moverCobrinha() {
@@ -101,7 +113,7 @@
         function verificarComida() {
             if (cobrinha[0].x === comida.x && cobrinha[0].y === comida.y) {
                 comida = gerarComida();
-                cobrinha.push({});
+                cobrinha.push({ ...cobrinha[cobrinha.length - 1] });
                 pontuacao++;
                 atualizarPontuacao();
             }
